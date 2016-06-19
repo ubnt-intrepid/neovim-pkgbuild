@@ -1,0 +1,41 @@
+# Maintainer: Yusuke Sasaki <yusuke.sasaki.nuem@gmail.com>
+
+_realname=neovim
+pkgbase="mingw-w64-${_realname}-git"
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
+provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=6016.e462ef7
+pkgrel=1
+pkgdesc="vim's rebirth for the 21st century (mingw-w64)"
+arch=('any')
+url="http://neovim.org/"
+license=("Custom: Apache 2.0" "Custom: Vim")
+depends=("${MINGW_PACKAGE_PREFIX}-libuv")
+makedepends=()
+options=('strip')
+source=("${_realname}"::"git+https://github.com/equalsraf/neovim.git#branch=tb-mingw")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "${srcdir}/${_realname}"
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
+  mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_PREFIX}/bin/cmake \
+      -G'MSYS Makefiles' \
+      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      ../${_realname}
+
+  make
+}
+
+package() {
+  cd "${srcdir}"/build-${CARCH}
+  make DESTDIR=${pkgdir} install
+}
