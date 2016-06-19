@@ -15,12 +15,19 @@ depends=("${MINGW_PACKAGE_PREFIX}-qt5"
          "${MINGW_PACKAGE_PREFIX}-msgpack-c")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake")
 options=('strip')
-source=("${_realname}"::"git+https://github.com/equalsraf/neovim-qt.git#branch=master")
-sha256sums=('SKIP')
+source=("${_realname}"::"git+https://github.com/equalsraf/neovim-qt.git#branch=master"
+        '0010-disable-windeployqt.patch')
+sha256sums=('SKIP'
+            'SKIP')
 
 pkgver() {
   cd "${srcdir}/${_realname}"
   printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+  cd "$srcdir/${_realname}"
+  patch -p1 -i $srcdir/0010-disable-windeployqt.patch
 }
 
 build() {
@@ -31,10 +38,16 @@ build() {
     ${MINGW_PREFIX}/bin/cmake \
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DCMAKE_BUILD_TYPE=Release \
       -DUSE_SYSTEM_MSGPACK=ON \
       ../${_realname}
 
   make
+}
+
+check() {
+  cd "${srcdir}"/build-${CARCH}
+  make test
 }
 
 package() {
