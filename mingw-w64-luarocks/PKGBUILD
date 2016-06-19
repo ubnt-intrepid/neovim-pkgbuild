@@ -1,0 +1,32 @@
+# Maintainer: Some One <some.one@some.email.com>
+
+_realname=luarocks
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=2.3.0
+pkgrel=1
+pkgdesc="Some package (mingw-w64)"
+arch=('any')
+url='https://www.somepackage.org/'
+license=('LICENSE')
+source=("https://github.com/keplerproject/${_realname}/archive/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+depends=("${MINGW_PACKAGE_PREFIX}-lua")
+makedepends=("${MINGW_PACKAGE_PREFIX}-lua")
+
+prepare() {
+  cd $srcdir/${_realname}-${pkgver}
+  # patch -p1 -i ${srcdir}/0001-A-fix.patch
+}
+
+build() {
+  cd "$srcdir"/${_realname}-${pkgver}
+  ./configure \
+    --prefix=${MINGW_PREFIX} \
+    --lua-version=5.3  
+}
+
+package() {
+  cd "$srcdir"/${_realname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+}
