@@ -9,14 +9,16 @@ pkgdesc="Some package (mingw-w64)"
 arch=('any')
 url='https://www.somepackage.org/'
 license=('LICENSE')
-source=("https://github.com/keplerproject/${_realname}/archive/v${pkgver}.tar.gz")
-sha256sums=('SKIP')
+source=("https://github.com/keplerproject/${_realname}/archive/v${pkgver}.tar.gz"
+        0010-fix-config.patch)
+sha256sums=('SKIP'
+            'SKIP')
 depends=("${MINGW_PACKAGE_PREFIX}-lua")
 makedepends=("${MINGW_PACKAGE_PREFIX}-lua")
 
 prepare() {
   cd $srcdir/${_realname}-${pkgver}
-  # patch -p1 -i ${srcdir}/0001-A-fix.patch
+  patch -p1 -i ${srcdir}/0010-fix-config.patch
 }
 
 build() {
