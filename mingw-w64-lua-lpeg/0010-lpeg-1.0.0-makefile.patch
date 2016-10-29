@@ -1,0 +1,19 @@
+--- a/makefile	2016-10-29 20:51:33.124750800 +0900
++++ b/makefile	2016-10-29 20:54:13.908061600 +0900
+@@ -35,9 +35,16 @@
+ macosx:
+ 	make lpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
+ 
++# For MinGW
++mingw:
++	make lpeg.dll "DLLFLAGS = -shared -fPIC"
++
+ lpeg.so: $(FILES)
+ 	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so
+ 
++lpeg.dll: $(FILES)
++	env $(CC) $(DLLFLAGS) $(CFLAGS) $(FILES) -o lpeg.dll $(LDFLAGS)
++
+ $(FILES): makefile
+ 
+ test: test.lua re.lua lpeg.so
