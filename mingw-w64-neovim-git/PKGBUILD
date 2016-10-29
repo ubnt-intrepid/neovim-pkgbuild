@@ -11,8 +11,20 @@ pkgdesc="vim's rebirth for the 21st century (mingw-w64)"
 arch=('any')
 url="http://neovim.org/"
 license=("Custom: Apache 2.0" "Custom: Vim")
-depends=("${MINGW_PACKAGE_PREFIX}-libuv")
-makedepends=()
+depends=("${MINGW_PACKAGE_PREFIX}-gettext"
+         "${MINGW_PACKAGE_PREFIX}-jemalloc"
+         "${MINGW_PACKAGE_PREFIX}-libuv"
+         "${MINGW_PACKAGE_PREFIX}-libiconv"
+         "${MINGW_PACKAGE_PREFIX}-msgpack-c")
+makedepends=("winpty"
+             "${MINGW_PACKAGE_PREFIX}-gettext"
+             "${MINGW_PACKAGE_PREFIX}-jemalloc"
+             "${MINGW_PACKAGE_PREFIX}-libiconv"
+             "${MINGW_PACKAGE_PREFIX}-libvterm"
+             "${MINGW_PACKAGE_PREFIX}-lua-lpeg"
+             "${MINGW_PACKAGE_PREFIX}-lua51-bitop"
+             "${MINGW_PACKAGE_PREFIX}-lua51-mpack"
+             "${MINGW_PACKAGE_PREFIX}-msgpack-c")
 options=('strip')
 source=("${_realname}"::"git+https://github.com/neovim/neovim.git#branch=master")
 sha256sums=('SKIP')
@@ -25,12 +37,6 @@ pkgver() {
 build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
-
-  # mkdir .deps
-  # pushd .deps
-  # ${MINGW_PREFIX}/bin/cmake -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release ../../${_realname}/third-party
-  # make VERBOSE=1
-  # popd
 
   export LUA_CPATH=$(cygpath -w ${MINGW_PREFIX}/lib/lua/5.1)\\'?.dll'
   
@@ -51,5 +57,5 @@ package() {
   cd "${srcdir}"/build-${CARCH}
   make DESTDIR=${pkgdir} install
 
-  rm -f "${pkgdir}${MINGW_PREFIX}"/bin/*.dll
+  # rm -f "${pkgdir}${MINGW_PREFIX}"/bin/*.dll
 }
