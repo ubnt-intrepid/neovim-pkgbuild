@@ -5,7 +5,7 @@ pkgbase="mingw-w64-${_realname}-git"
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=6632.c57a816
+pkgver=6698.3d49fc1
 pkgrel=1
 pkgdesc="vim's rebirth for the 21st century (mingw-w64)"
 arch=('any')
@@ -14,7 +14,7 @@ license=("Custom: Apache 2.0" "Custom: Vim")
 depends=("${MINGW_PACKAGE_PREFIX}-libuv")
 makedepends=()
 options=('strip')
-source=("${_realname}"::"git+https://github.com/equalsraf/neovim.git#branch=tb-mingw")
+source=("${_realname}"::"git+https://github.com/neovim/neovim.git#branch=master")
 sha256sums=('SKIP')
 
 pkgver() {
@@ -32,12 +32,16 @@ build() {
   # make VERBOSE=1
   # popd
 
-
+  export LUA_CPATH=$(cygpath -w ${MINGW_PREFIX}/lib/lua/5.1)\\'?.dll'
+  
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     ${MINGW_PREFIX}/bin/cmake \
       -G'MSYS Makefiles' \
+      -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DLUA_PRG=${MINGW_PREFIX}/bin/luajit.exe \
       -DWINPTY_INCLUDE_DIR=/usr/include \
+      -DENABLE_JEMALLOC=ON \
       ../${_realname}
 
   make
@@ -46,4 +50,6 @@ build() {
 package() {
   cd "${srcdir}"/build-${CARCH}
   make DESTDIR=${pkgdir} install
+
+  rm -f "${pkgdir}${MINGW_PREFIX}"/bin/*.dll
 }
