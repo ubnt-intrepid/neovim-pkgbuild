@@ -1,0 +1,86 @@
+# Maintainer: Yusuke Sasaki <yusuke.sasaki.nuem@gmail.com>
+
+_realname=python-msgpack
+pkgbase="mingw-w64-${_realname}"
+pkgname=("${MINGW_PACKAGE_PREFIX}-python2-msgpack"
+         "${MINGW_PACKAGE_PREFIX}-python3-msgpack")
+pkgver=0.4.8
+pkgrel=1
+arch=('any')
+url="https://github.com/msgpack/msgpack-python"
+license=("Apache")
+depends=()
+makedepends=("${MINGW_PACKAGE_PREFIX}-cython2"
+             "${MINGW_PACKAGE_PREFIX}-cython"
+             "${MINGW_PACKAGE_PREFIX}-python2-setuptools"
+             "${MINGW_PACKAGE_PREFIX}-python3-setuptools")
+checkdepends=("${MINGW_PACKAGE_PREFIX}-python2-py"
+              "${MINGW_PACKAGE_PREFIX}-python3-py"
+              "${MINGW_PACKAGE_PREFIX}-python2-pytest"
+              "${MINGW_PACKAGE_PREFIX}-python3-pytest"
+              "${MINGW_PACKAGE_PREFIX}-python2-colorama"
+              "${MINGW_PACKAGE_PREFIX}-python3-colorama"
+              "${MINGW_PACKAGE_PREFIX}-python2-six"
+              "${MINGW_PACKAGE_PREFIX}-python3-six")
+source=("https://pypi.io/packages/source/m/msgpack-python/msgpack-python-${pkgver}.tar.gz")
+sha256sums=('1a2b19df0f03519ec7f19f826afb935b202d8979b0856c6fb3dc28955799f886')
+
+build() {
+  cd "${srcdir}/msgpack-python-${pkgver}"
+
+  ${MINGW_PREFIX}/bin/python2 setup.py build --build-lib=build/python2
+  find build/python2 -type f -exec \
+    sed -i '1s,^#! \?/usr/bin/\(env \|\)python$,#!'"${MINGW_PREFIX}"'/bin/python2,' {} \;
+
+  ${MINGW_PREFIX}/bin/python3 setup.py build --build-lib=build/python3
+  find build/python3 -type f -exec \
+    sed -i '1s,^#! \?/usr/bin/\(env \|\)python$,#!'"${MINGW_PREFIX}"'/bin/python3,' {} \;
+}
+
+check() {
+  cd "${srcdir}/msgpack-python-${pkgver}"
+
+  msg2 'Checking for Python2 ...'
+  PYTHONPATH=$PWD/build/python2 ${MINGW_PREFIX}/bin/py.test2 test
+
+  msg2 'Checking for Python3 ...'
+  PYTHONPATH=$PWD/build/python3 ${MINGW_PREFIX}/bin/py.test test
+}
+
+package_mingw-w64-python2-msgpack() {
+  pkgdesc="MessagePack serializer implementation for Python2 (mingw-w64)"
+  depends=("${MINGW_PACKAGE_PREFIX}-python2")
+  
+  cd "${srcdir}/msgpack-python-${pkgver}"
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python2 setup.py \
+      build   --build-lib=build/python2 \
+      install --prefix=${MINGW_PREFIX} --root="${pkgdir}" --optimize=1
+}
+
+package_mingw-w64-python3-msgpack() {
+  pkgdesc="MessagePack serializer implementation for Python3 (mingw-w64)"
+  depends=("${MINGW_PACKAGE_PREFIX}-python3")
+  
+  cd "${srcdir}/msgpack-python-${pkgver}"
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python3 setup.py \
+      build   --build-lib=build/python3 \
+      install --prefix=${MINGW_PREFIX} --root="${pkgdir}" --optimize=1
+}
+
+package_mingw-w64-i686-python2-msgpack() {
+  package_mingw-w64-python2-msgpack
+}
+
+package_mingw-w64-i686-python3-msgpack() {
+  package_mingw-w64-python3-msgpack
+}
+
+package_mingw-w64-x86_64-python2-msgpack() {
+  package_mingw-w64-python2-msgpack
+}
+
+package_mingw-w64-x86_64-python3-msgpack() {
+  package_mingw-w64-python3-msgpack
+}
