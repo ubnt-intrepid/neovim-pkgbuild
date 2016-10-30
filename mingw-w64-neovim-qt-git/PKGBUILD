@@ -45,10 +45,10 @@ build() {
   make
 }
 
-check() {
-  cd "${srcdir}"/build-${CARCH}
-  make test
-}
+# check() {
+#   cd "${srcdir}"/build-${CARCH}
+#   make test
+# }
 
 package() {
   cd "${srcdir}"/build-${CARCH}

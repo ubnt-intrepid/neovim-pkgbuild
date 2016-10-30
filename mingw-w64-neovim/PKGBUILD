@@ -27,13 +27,15 @@ makedepends=("winpty"
 options=('strip')
 source=("${_realname}"::"git+https://github.com/neovim/neovim.git#tag=v${pkgver}"
         0010-fix-pythonx-runtime.patch
-        0020-avoid-to-copy-dll.patch)
-sha256sums=('SKIP' 'SKIP' 'SKIP')
+        0020-avoid-to-copy-dll.patch
+        0030-fix-stdpaths.patch)
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
   cd "${srcdir}/${_realname}"
   patch -p1 -i "${srcdir}/0010-fix-pythonx-runtime.patch"
   patch -p1 -i "${srcdir}/0020-avoid-to-copy-dll.patch"
+  patch -p1 -i "${srcdir}/0030-fix-stdpaths.patch"
 }
 
 build() {
@@ -47,8 +49,8 @@ build() {
       -G'MSYS Makefiles' \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DCMAKE_INSTALL_FULL_DATAROOTDIR=$(cygpath -w ${MINGW_PREFIX}/share) \
       -DLUA_PRG=${MINGW_PREFIX}/bin/luajit.exe \
-      -DWINPTY_INCLUDE_DIR=/usr/include \
       -DENABLE_JEMALLOC=ON \
       ../${_realname}
 
