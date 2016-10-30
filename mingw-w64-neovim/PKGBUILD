@@ -1,11 +1,9 @@
 # Maintainer: Yusuke Sasaki <yusuke.sasaki.nuem@gmail.com>
 
 _realname=neovim
-pkgbase="mingw-w64-${_realname}-git"
-pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
-provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=6698.3d49fc1
+pkgbase="mingw-w64-${_realname}"
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=0.1.6
 pkgrel=1
 pkgdesc="vim's rebirth for the 21st century (mingw-w64)"
 arch=('any')
@@ -21,17 +19,21 @@ makedepends=("winpty"
              "${MINGW_PACKAGE_PREFIX}-jemalloc"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
              "${MINGW_PACKAGE_PREFIX}-libvterm"
-             "${MINGW_PACKAGE_PREFIX}-lua-lpeg"
+             "${MINGW_PACKAGE_PREFIX}-lua51-lpeg"
              "${MINGW_PACKAGE_PREFIX}-lua51-bitop"
              "${MINGW_PACKAGE_PREFIX}-lua51-mpack"
+             "${MINGW_PACKAGE_PREFIX}-luajit-git"
              "${MINGW_PACKAGE_PREFIX}-msgpack-c")
 options=('strip')
-source=("${_realname}"::"git+https://github.com/neovim/neovim.git#branch=master")
-sha256sums=('SKIP')
+source=("${_realname}"::"git+https://github.com/neovim/neovim.git#tag=v${pkgver}"
+        0010-fix-pythonx-runtime.patch
+        0020-avoid-to-copy-dll.patch)
+sha256sums=('SKIP' 'SKIP' 'SKIP')
 
-pkgver() {
+prepare() {
   cd "${srcdir}/${_realname}"
-  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  patch -p1 -i "${srcdir}/0010-fix-pythonx-runtime.patch"
+  patch -p1 -i "${srcdir}/0020-avoid-to-copy-dll.patch"
 }
 
 build() {
@@ -56,6 +58,4 @@ build() {
 package() {
   cd "${srcdir}"/build-${CARCH}
   make DESTDIR=${pkgdir} install
-
-  # rm -f "${pkgdir}${MINGW_PREFIX}"/bin/*.dll
 }

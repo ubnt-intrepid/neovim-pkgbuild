@@ -1,0 +1,13 @@
+diff --git a/src/nvim/CMakeLists.txt b/src/nvim/CMakeLists.txt
+index 49edfda..fcfcc0a 100644
+--- a/src/nvim/CMakeLists.txt
++++ b/src/nvim/CMakeLists.txt
+@@ -291,7 +291,7 @@ add_executable(nvim ${NEOVIM_GENERATED_SOURCES} ${NEOVIM_SOURCES}
+ target_link_libraries(nvim ${NVIM_EXEC_LINK_LIBRARIES})
+ install_helper(TARGETS nvim)
+ 
+-if(WIN32)
++if(WIN32 AND NOT MINGW)
+   # Copy DLLs to bin/ and install them along with nvim
+   add_custom_target(nvim_dll_deps ALL DEPENDS nvim
+     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/windows_runtime_deps

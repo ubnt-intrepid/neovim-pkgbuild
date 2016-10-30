@@ -1,0 +1,29 @@
+diff --git a/runtime/autoload/provider/pythonx.vim b/runtime/autoload/provider/pythonx.vim
+index 6d6b389..0ebae4f 100644
+--- a/runtime/autoload/provider/pythonx.vim
++++ b/runtime/autoload/provider/pythonx.vim
+@@ -22,7 +22,7 @@ function! provider#pythonx#Require(host) abort
+ 
+   " Python host arguments
+   let prog = (ver == '2' ?  provider#python#Prog() : provider#python3#Prog())
+-  let args = [prog, '-c', 'import sys; sys.path.remove(""); import neovim; neovim.start_host()']
++  let args = [prog, '-c', '"import sys; sys.path.remove(\"\"); import neovim; neovim.start_host()"']
+ 
+   " Collect registered Python plugins into args
+   let python_plugins = remote#host#PluginsForHost(a:host.name)
+@@ -101,11 +101,11 @@ function! s:check_interpreter(prog, major_ver, skip) abort
+   "   2  Neovim module cannot be loaded.
+   "   Otherwise something else went wrong (e.g. 1 or 127).
+   let prog_ver = system([ a:prog , '-c' ,
+-        \ 'import sys; ' .
+-        \ 'sys.path.remove(""); ' .
+-        \ 'sys.stdout.write(str(sys.version_info[0]) + "." + str(sys.version_info[1])); ' .
++        \ '"import sys; ' .
++        \ 'sys.path.remove(\"\"); ' .
++        \ 'sys.stdout.write(str(sys.version_info[0]) + \".\" + str(sys.version_info[1])); ' .
+         \ 'import pkgutil; ' .
+-        \ 'exit(2*int(pkgutil.get_loader("neovim") is None))'
++        \ 'exit(2*int(pkgutil.get_loader(\"neovim\") is None))"'
+         \ ])
+ 
+   if v:shell_error == 2 || v:shell_error == 0

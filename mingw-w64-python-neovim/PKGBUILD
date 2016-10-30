@@ -1,0 +1,72 @@
+# Maintainer: Yusuke Sasaki <yusuke.sasaki.nuem@gmail.com>
+
+_realname=python-neovim
+pkgbase="mingw-w64-${_realname}"
+pkgname=("${MINGW_PACKAGE_PREFIX}-python2-neovim"
+         "${MINGW_PACKAGE_PREFIX}-python3-neovim")
+pkgver=0.1.10
+pkgrel=1
+arch=('any')
+url="https://github.com/neovim/python-client"
+license=("Apache")
+makedepends=("${MINGW_PACKAGE_PREFIX}-python2"
+             "${MINGW_PACKAGE_PREFIX}-python3"
+             "${MINGW_PACKAGE_PREFIX}-python2-msgpack"
+             "${MINGW_PACKAGE_PREFIX}-python3-msgpack"
+             "${MINGW_PACKAGE_PREFIX}-python2-pyuv"
+             "${MINGW_PACKAGE_PREFIX}-python3-pyuv")
+source=("https://github.com/neovim/python-client/archive/${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+prepare() {
+  cp -a "python-client-${pkgver}" build-python2
+  cp -a "python-client-${pkgver}" build-python3
+}
+
+build() {
+  cd "${srcdir}/build-python2"
+  ${MINGW_PREFIX}/bin/python2 setup.py build
+
+  cd "${srcdir}/build-python3"
+  ${MINGW_PREFIX}/bin/python3 setup.py build
+}
+
+package_mingw-w64-python2-neovim() {
+  pkgdesc="Python2 client for Neovim (mingw-w64)"
+  depends=("${MINGW_PACKAGE_PREFIX}-python2"
+           "${MINGW_PACKAGE_PREFIX}-python2-msgpack"
+           "${MINGW_PACKAGE_PREFIX}-python2-pyuv")
+  
+  cd "${srcdir}/build-python2"
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python2 setup.py \
+      install --skip-build --prefix=${MINGW_PREFIX} --root="${pkgdir}" --optimize=1
+}
+
+package_mingw-w64-python3-neovim() {
+  pkgdesc="Python3 client for Neovim (mingw-w64)"
+  depends=("${MINGW_PACKAGE_PREFIX}-python3"
+           "${MINGW_PACKAGE_PREFIX}-python3-msgpack"
+           "${MINGW_PACKAGE_PREFIX}-python3-pyuv")
+  
+  cd "${srcdir}/build-python3"
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python3 setup.py \
+      install --skip-build --prefix=${MINGW_PREFIX} --root="${pkgdir}" --optimize=1
+}
+
+package_mingw-w64-i686-python2-neovim() {
+  package_mingw-w64-python2-neovim
+}
+
+package_mingw-w64-i686-python3-neovim() {
+  package_mingw-w64-python3-neovim
+}
+
+package_mingw-w64-x86_64-python2-neovim() {
+  package_mingw-w64-python2-neovim
+}
+
+package_mingw-w64-x86_64-python3-neovim() {
+  package_mingw-w64-python3-neovim
+}
