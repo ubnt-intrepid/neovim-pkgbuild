@@ -44,6 +44,11 @@ package_mingw-w64-python2-pyuv() {
     ${MINGW_PREFIX}/bin/python2 setup.py \
       install --skip-build --prefix=${MINGW_PREFIX} --root="${pkgdir}"
   install -m0644 -D LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/python2-${_realname}/LICENSE"
+
+  # FIXME fix setup.py instead of manually copy.
+  install -m0644 pyuv/{__init__.py,_version.py} ${pkgdir}${MINGW_PREFIX}/lib/python2.7/site-packages/pyuv/
+  cd ${pkgdir}${MINGW_PREFIX}/lib/python2.7/site-packages/pyuv
+  ${MINGW_PREFIX}/bin/python2 -m compileall .
 }
 
 package_mingw-w64-python3-pyuv() {
@@ -56,6 +61,11 @@ package_mingw-w64-python3-pyuv() {
     ${MINGW_PREFIX}/bin/python3 setup.py \
       install --skip-build --prefix=${MINGW_PREFIX} --root="${pkgdir}"
   install -m0644 -D LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/python3-${_realname}/LICENSE"
+
+  # FIXME fix setup.py instead of manually copy.
+  install -m0644 pyuv/{__init__.py,_version.py} ${pkgdir}${MINGW_PREFIX}/lib/python3.5/site-packages/pyuv/
+  cd ${pkgdir}${MINGW_PREFIX}/lib/python3.5/site-packages/pyuv
+  ${MINGW_PREFIX}/bin/python3 -m compileall .
 }
 
 package_mingw-w64-i686-python2-pyuv() {
