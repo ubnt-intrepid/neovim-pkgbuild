@@ -1,0 +1,75 @@
+# Maintainer: Yusuke Sasaki <yusuke.sasaki.nuem@gmail.com>
+
+_realname=python-pyuv
+pkgbase="mingw-w64-${_realname}"
+pkgname=("${MINGW_PACKAGE_PREFIX}-python2-pyuv"
+         "${MINGW_PACKAGE_PREFIX}-python3-pyuv")
+pkgver=1.3.0
+pkgrel=1
+arch=('any')
+url="https://crate.io/packages/pyuv"
+license=("MIT")
+makedepends=("${MINGW_PACKAGE_PREFIX}-cython2"
+             "${MINGW_PACKAGE_PREFIX}-cython"
+             "${MINGW_PACKAGE_PREFIX}-python2-setuptools"
+             "${MINGW_PACKAGE_PREFIX}-python3-setuptools")
+source=("https://github.com/saghul/pyuv/archive/pyuv-${pkgver}.tar.gz"
+        0010-fix-patch.patch)
+sha256sums=('SKIP' 'SKIP')
+
+prepare() {
+  cd "${srcdir}/pyuv-pyuv-${pkgver}"
+  patch -p1 -i "${srcdir}/0010-fix-patch.patch"
+
+  cd ..
+  cp -r "pyuv-pyuv-${pkgver}" build-python2
+  cp -r "pyuv-pyuv-${pkgver}" build-python3
+}
+
+build() {
+  cd "${srcdir}/build-python2"
+  ${MINGW_PREFIX}/bin/python2 setup.py build_ext --use-system-libuv
+
+  cd "${srcdir}/build-python3"
+  ${MINGW_PREFIX}/bin/python3 setup.py build_ext --use-system-libuv
+}
+
+package_mingw-w64-python2-pyuv() {
+  pkgdesc="A Python module which provides an interface to libuv. (mingw-w64)"
+  depends=("${MINGW_PACKAGE_PREFIX}-python2"
+           "${MINGW_PACKAGE_PREFIX}-libuv")
+  
+  cd "${srcdir}/build-python2"
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python2 setup.py \
+      install --skip-build --prefix=${MINGW_PREFIX} --root="${pkgdir}"
+  install -m0644 -D LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/python2-${_realname}/LICENSE"
+}
+
+package_mingw-w64-python3-pyuv() {
+  pkgdesc="A Python3 module which provides an interface to libuv. (mingw-w64)"
+  depends=("${MINGW_PACKAGE_PREFIX}-python3"
+           "${MINGW_PACKAGE_PREFIX}-libuv")
+  
+  cd "${srcdir}/build-python3"
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python3 setup.py \
+      install --skip-build --prefix=${MINGW_PREFIX} --root="${pkgdir}"
+  install -m0644 -D LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/python3-${_realname}/LICENSE"
+}
+
+package_mingw-w64-i686-python2-pyuv() {
+  package_mingw-w64-python2-pyuv
+}
+
+package_mingw-w64-i686-python3-pyuv() {
+  package_mingw-w64-python3-pyuv
+}
+
+package_mingw-w64-x86_64-python2-pyuv() {
+  package_mingw-w64-python2-pyuv
+}
+
+package_mingw-w64-x86_64-python3-pyuv() {
+  package_mingw-w64-python3-pyuv
+}
